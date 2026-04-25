@@ -40,3 +40,22 @@ func TestFilterPreservesSnapshotMeta(t *testing.T) {
 		t.Fatalf("unexpected filtered ID: %s", out.ID)
 	}
 }
+
+// TestFilterNoMatchReturnsEmpty verifies that filters with no matching entries
+// return an empty (non-nil) entries slice rather than an error.
+func TestFilterNoMatchReturnsEmpty(t *testing.T) {
+	s := makeSnap()
+	out, err := filter.Apply(s, filter.Options{
+		Level:     "debug",
+		ServiceID: "svc-nonexistent",
+	})
+	if err != nil {
+		t.Fatalf("expected no error for zero-match filter, got: %v", err)
+	}
+	if out.Entries == nil {
+		t.Fatal("expected non-nil entries slice for zero-match filter")
+	}
+	if len(out.Entries) != 0 {
+		t.Fatalf("expected 0 entries, got %d", len(out.Entries))
+	}
+}
