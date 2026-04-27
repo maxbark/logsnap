@@ -59,6 +59,25 @@ func Run(w io.Writer, snap *snapshot.Snapshot, opts Options) error {
 	return nil
 }
 
+// RunFiltered replays only the entries in snap that satisfy the given predicate.
+// It otherwise behaves identically to Run.
+func RunFiltered(w io.Writer, snap *snapshot.Snapshot, opts Options, keep func(snapshot.Entry) bool) error {
+	if snap == nil {
+		return fmt.Errorf("replay: snapshot must not be nil")
+	}
+	if keep == nil {
+		return Run(w, snap, opts)
+	}
+
+	filtered := &snapshot.Snapshot{}
+	for _, entry := range snap.Entries {
+		if keep(entry) {
+			filtered.Entries = append(filtered.Entries, entry)
+		}
+	}
+	return Run(w, filtered, opts)
+}
+
 func formatText(e snapshot.Entry) string {
 	return fmt.Sprintf("[%s] %s %s: %s", e.Level, e.Timestamp.Format(time.RFC3339), e.ServiceID, e.Message)
 }
