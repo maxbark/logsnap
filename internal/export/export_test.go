@@ -77,3 +77,14 @@ func TestWriteUnsupportedFormat(t *testing.T) {
 		t.Fatal("expected error for unsupported format, got nil")
 	}
 }
+
+func TestWriteEmptySnapshot(t *testing.T) {
+	snap := snapshot.New("empty-snap")
+	formats := []export.Format{export.FormatJSON, export.FormatCSV, export.FormatText}
+	for _, fmt := range formats {
+		var buf bytes.Buffer
+		if err := export.Write(snap, fmt, &buf); err != nil {
+			t.Errorf("format %q: unexpected error for empty snapshot: %v", fmt, err)
+		}
+	}
+}
