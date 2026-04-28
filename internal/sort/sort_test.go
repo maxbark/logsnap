@@ -92,3 +92,14 @@ func TestApply_PreservesMetadata(t *testing.T) {
 		t.Errorf("expected label to be preserved, got %q", out.Label)
 	}
 }
+
+func TestApply_EmptyEntries(t *testing.T) {
+	snap := makeSnap([]snapshot.Entry{})
+	out, err := logsort.Apply(snap, logsort.DefaultOptions())
+	if err != nil {
+		t.Fatalf("unexpected error for empty entries: %v", err)
+	}
+	if len(out.Entries) != 0 {
+		t.Errorf("expected empty entries, got %d entries", len(out.Entries))
+	}
+}
